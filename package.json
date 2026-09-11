@@ -11,9 +11,9 @@
     "@material-ui/core": "^4.7.0",
     "@material-ui/icons": "^4.5.1",
     "axios": "^0.21.1",
-    "cors": "^2.8.5",
-    "express": "^4.17.1",
-    "gremlin": "^3.4.4",
+    "cors": "^2.8.6",
+    "express": "^4.22.2",
+    "gremlin": "^3.8.2",
     "lodash": "^4.17.15",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
@@ -34,7 +34,8 @@
     "eject": "react-scripts eject"
   },
   "devDependencies": {
-    "concurrently": "^5.0.0"
+    "concurrently": "^5.0.0",
+    "supertest": "^7.1.4"
   },
   "browserslist": {
     "production": [

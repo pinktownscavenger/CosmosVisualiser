@@ -1,12 +1,5 @@
-const express = require('express');
 const gremlin = require('gremlin');
-const cors = require('cors');
-const {
-  makeEdgeQuery,
-  makeVertexQuery,
-  verticesToJson
-} = require('./src/server/graphHelpers');
-const app = express();
+const { createApp } = require('./src/server/app');
 const port = Number(process.env.PORT || 3001);
 
 const endpoint = process.env.COSMOS_ENDPOINT;
@@ -42,37 +35,6 @@ const client = new gremlin.driver.Client(endpoint, {
   rejectUnauthorized: true
 });
 
-app.use(cors({
-  origin: allowedOrigin,
-  credentials: true
-}));
-
-app.use(express.json());
-
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
-});
-
-app.post('/query', async (req, res) => {
-  const nodeLimit = req.body.nodeLimit;
-  const query = req.body.query;
-
-  if (!query || typeof query !== 'string') {
-    res.status(400).send({ error: 'A Gremlin query is required' });
-    return;
-  }
-
-  try {
-    const vertexResult = await client.submit(makeVertexQuery(query, nodeLimit), {});
-    const vertices = vertexResult._items || [];
-    const edgeQuery = makeEdgeQuery(vertices.map(vertex => vertex.id));
-    const edgeResult = edgeQuery ? await client.submit(edgeQuery, {}) : { _items: [] };
-
-    res.send(verticesToJson(vertices, edgeResult._items || []));
-  } catch (error) {
-    console.error('Error fetching graph data:', error);
-    res.status(500).send({ error: 'Failed to fetch graph data' });
-  }
-});
+const app = createApp({ client, allowedOrigin });
 
 app.listen(port, () => console.log(`Simple gremlin-proxy server listening on port ${port}!`));
