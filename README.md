@@ -1,75 +1,96 @@
-# Gremlin-Visualizer
-This project is to visualize the graph network corresponding to a gremlin query.
+# Cosmos Gremlin Visualizer
 
-![alt text](https://raw.githubusercontent.com/prabushitha/Readme-Materials/master/Gremlin-Visualizer.png)
+A local React visualizer for Gremlin graph queries, with a small Node/Express proxy for Azure Cosmos DB Gremlin API.
 
-### Setting Up Gremlin Visualizer
-To setup gremlin visualizer, you need to have `node.js` and `npm` installed in your system.
+The app lets you run a Gremlin vertex query, render the returned graph with `vis-network`, inspect node and edge properties, customize node labels, view query history, cap returned vertices, and traverse inbound or outbound connections from a selected node.
 
-* Clone the project
+## Requirements
+
+- Node.js and npm
+- Azure Cosmos DB account using the Gremlin API
+
+This project still uses an older Create React App / React 16 stack. The npm scripts include the OpenSSL compatibility flag needed by newer Node versions.
+
+## Configuration
+
+Copy the example environment file and fill in your Cosmos DB details:
+
 ```sh
-git clone https://github.com/prabushitha/gremlin-visualizer.git
+cp .env.example .env
 ```
-* Install dependencies
+
+Required server variables:
+
 ```sh
-npm install
+COSMOS_ENDPOINT=wss://your-account.gremlin.cosmos.azure.com:443/
+COSMOS_PRIMARY_KEY=your-cosmos-primary-key
+COSMOS_DATABASE=your-database
+COSMOS_CONTAINER=your-graph-container
+CORS_ORIGIN=http://localhost:3000
+PORT=3001
 ```
-* Run the project
+
+Optional React variable:
+
 ```sh
+REACT_APP_API_BASE_URL=
+```
+
+Leave `REACT_APP_API_BASE_URL` blank during local development so Create React App uses the proxy configured in `package.json`. Set it only when the frontend is served from a different origin than the API proxy.
+
+## Run Locally
+
+```sh
+npm install --legacy-peer-deps
 npm start
 ```
-* Open the browser and navigate to
+
+Open:
+
 ```sh
 http://localhost:3000
 ```
 
-Note - Frontend starts on port 3000 and simple Node.js server also starts on port 3001. If you need to change the ports, configure in `package.json`, `proxy-server.js`, `src/constants` 
+The React app runs on port `3000`; the API proxy defaults to port `3001`.
 
-#### Setting up with Docker
-
-You can build a Docker image of the gremlin visualizer with the included `Dockerfile`.
-This will use the current version of the `master` branch of the source GitHub repository.
-The Docker image can be built by calling the `docker build` command, for example:
+## Useful Scripts
 
 ```sh
-docker build --tag=gremlin-visualizer:latest .
+npm run client
+npm run server
+npm run build
+npm test
 ```
 
-The image can also be downloaded from Docker hub: [`prabushitha/gremlin-visualizer:latest`](https://hub.docker.com/r/prabushitha/gremlin-visualizer).
+## Docker
+
+Build the image from this repository:
 
 ```sh
-docker pull prabushitha/gremlin-visualizer:latest
+docker build --tag=cosmos-gremlin-visualizer:latest .
 ```
 
-The Docker image can then be run by calling `docker run` and exposing the necessary ports for communication. See [Docker's documentation](https://docs.docker.com/engine/reference/commandline/run/) for more options on how to run the image.
+Run it with your environment file:
 
 ```sh
-# if you built the image yourself
-docker run --rm -d -p 3000:3000 -p 3001:3001 --name=gremlin-visualizer --network=host gremlin-visualizer:latest
-# if you downloaded from Docker Hub
-docker run --rm -d -p 3000:3000 -p 3001:3001 --name=gremlin-visualizer --network=host prabushitha/gremlin-visualizer:latest
+docker run --rm \
+  -p 3000:3000 \
+  -p 3001:3001 \
+  --env-file .env \
+  --name=cosmos-gremlin-visualizer \
+  cosmos-gremlin-visualizer:latest
 ```
-Note that `--network=host` is not needed if you don't run your gremlin server in the host machine. 
 
-The Docker container can be stopped by calling `docker stop gremlin-visualizer`.
+## Query Behavior
 
-### Usage
-* Start Gremlin-Visualizer as mentioned above
-* Start or tunnel a gremlin server
-* Specify the host and port of the gremlin server
-* Write an gremlin query to retrieve a set of nodes (eg. `g.V()`)
+Submit Gremlin queries that return vertices, for example:
 
-### Features
-* If you don't clear the graph and execute another gremlin query, results of previous query and new query will be merged and be shown.
-* Node and edge properties are shown once you click on a node/edge
-* Change the labels of nodes to any property
-* View the set of queries executed to generate the graph
-* Traverse in/out from the selected node
+```groovy
+g.V().limit(25)
+```
 
-### 
-## Contributors
-* Umesh Jayasinghe (Github: prabushitha)
+The server applies the configured node limit to the vertex query, then fetches edges adjacent to the returned vertices and sends a normalized graph payload to the frontend.
 
-## Something Missing?
+## Security Notes
 
-If you have new ideas to improve please create a issue and make a pull request
+Do not commit `.env` files or Cosmos DB keys. If a key was ever committed or shared, rotate it in Azure before publishing the repository.

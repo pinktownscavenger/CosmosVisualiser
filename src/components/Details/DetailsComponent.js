@@ -60,7 +60,7 @@ class Details extends React.Component {
     const query = `g.V('${nodeId}').${direction}()`;
     axios.post(
       QUERY_ENDPOINT,
-      { host: this.props.host, port: this.props.port, query: query, nodeLimit: this.props.nodeLimit },
+      { query, nodeLimit: this.props.nodeLimit },
       { headers: { 'Content-Type': 'application/json' } }
     ).then((response) => {
       onFetchQuery(response, query, this.props.nodeLabels, this.props.dispatch);
@@ -82,47 +82,34 @@ class Details extends React.Component {
   }
 
   generateList(list) {
-    let key = 0;
-    return list.map(value => {
-      key = key+1;
-      return React.cloneElement((
-        <ListItem>
+    return list.map((value, index) => (
+        <ListItem key={`${value}-${index}`}>
           <ListItemText
             primary={value}
           />
         </ListItem>
-      ), {
-        key
-      })
-    });
+    ));
   }
 
   generateNodeLabelList(nodeLabels) {
-    let index = -1;
-    return nodeLabels.map( nodeLabel => {
-      index = index+1;
-      nodeLabel.index = index;
-      return React.cloneElement((
-        <ListItem>
+    return nodeLabels.map((nodeLabel, index) => (
+        <ListItem key={index}>
           <TextField id="standard-basic" label="Node Type" InputLabelProps={{ shrink: true }} value={nodeLabel.type} onChange={event => {
             const type = event.target.value;
             const field = nodeLabel.field;
-            this.onEditNodeLabel(nodeLabel.index, { type, field })
+            this.onEditNodeLabel(index, { type, field })
           }}
           />
           <TextField id="standard-basic" label="Label Field" InputLabelProps={{ shrink: true }} value={nodeLabel.field} onChange={event => {
             const field = event.target.value;
             const type = nodeLabel.type;
-            this.onEditNodeLabel(nodeLabel.index, { type, field })
+            this.onEditNodeLabel(index, { type, field })
           }}/>
-          <IconButton aria-label="delete" size="small" onClick={() => this.onRemoveNodeLabel(nodeLabel.index)}>
+          <IconButton aria-label="delete" size="small" onClick={() => this.onRemoveNodeLabel(index)}>
             <DeleteIcon fontSize="small" />
           </IconButton>
         </ListItem>
-      ), {
-        key: index
-      })
-    });
+    ));
   }
 
   render(){
@@ -135,16 +122,14 @@ class Details extends React.Component {
       hasSelected = true;
       selectedType =  _.get(this.props.selectedNode, 'type');
       selectedId = _.get(this.props.selectedNode, 'id');
-      selectedProperties = _.get(this.props.selectedNode, 'properties');
-      stringifyObjectValues(selectedProperties);
+      selectedProperties = stringifyObjectValues(_.get(this.props.selectedNode, 'properties', {}));
       selectedHeader = 'Node';
     } else if (!_.isEmpty(this.props.selectedEdge)) {
       hasSelected = true;
       selectedType =  _.get(this.props.selectedEdge, 'type');
       selectedId = _.get(this.props.selectedEdge, 'id');
-      selectedProperties = _.get(this.props.selectedEdge, 'properties');
+      selectedProperties = stringifyObjectValues(_.get(this.props.selectedEdge, 'properties', {}));
       selectedHeader = 'Edge';
-      stringifyObjectValues(selectedProperties);
     }
 
 
@@ -274,8 +259,6 @@ class Details extends React.Component {
 
 export const DetailsComponent = connect((state)=>{
   return {
-    host: state.gremlin.host,
-    port: state.gremlin.port,
     network: state.graph.network,
     selectedNode: state.graph.selectedNode,
     selectedEdge: state.graph.selectedEdge,

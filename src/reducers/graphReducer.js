@@ -54,7 +54,7 @@ export const reducer =  (state=initialState, action)=>{
     }
     case ACTIONS.REFRESH_NODE_LABELS: {
       const nodeLabelMap =_.mapValues( _.keyBy(action.payload, 'type'), 'field');
-      _.map(state.nodes, node => {
+      const nodes = _.map(state.nodes, node => {
         if (node.type in nodeLabelMap) {
           const field = nodeLabelMap[node.type];
           const label = node.properties[field];
@@ -63,7 +63,7 @@ export const reducer =  (state=initialState, action)=>{
         }
         return node;
       });
-      return state;
+      return { ...state, nodes };
     }
     default:
       return state;

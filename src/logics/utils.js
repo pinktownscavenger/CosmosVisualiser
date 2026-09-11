@@ -11,15 +11,14 @@ export const getDiffNodes = (newList, oldList) => {
 };
 
 export const getDiffEdges = (newList, oldList) => {
-  return _.differenceBy(newList, oldList, (edge) => `${edge.from},${edge.to}`);
+  return _.differenceBy(newList, oldList, (edge) => edge.id || `${edge.from},${edge.type},${edge.to}`);
 };
 
 export const extractEdgesAndNodes = (nodeList, nodeLabels=[]) => {
   let edges = [];
   const nodes = [];
 
-  console.log('Received nodeList:', nodeList); // new
-
+  const nextNodeLabels = [...nodeLabels];
   const nodeLabelMap =_.mapValues( _.keyBy(nodeLabels, 'type'), 'field');
 
   _.forEach(nodeList, (node) => {
@@ -27,19 +26,17 @@ export const extractEdgesAndNodes = (nodeList, nodeLabels=[]) => {
     if (!nodeLabelMap[type]) {
       const field = selectRandomField(node.properties);
       const nodeLabel = { type, field };
-      nodeLabels.push(nodeLabel);
+      nextNodeLabels.push(nodeLabel);
       nodeLabelMap[type] = field;
     }
     const labelField = nodeLabelMap[type];
     const label = labelField in node.properties ? node.properties[labelField] : type;
     nodes.push({ id: node.id, label: String(label), group: node.label, properties: node.properties, type });
 
-    console.log('Edges from node:', node.id, node.edges); // new
-
     edges = edges.concat(_.map(node.edges, edge => ({ ...edge, type: edge.label, arrows: { to: { enabled: true, scaleFactor: 0.5 } } })));
   });
 
-  return { edges, nodes, nodeLabels }
+  return { edges, nodes, nodeLabels: nextNodeLabels }
 };
 
 export const findNodeById = (nodeList, id) => {
@@ -47,9 +44,5 @@ export const findNodeById = (nodeList, id) => {
 };
 
 export const stringifyObjectValues = (obj) => {
-  _.forOwn(obj, (value, key) => {
-    if (!_.isString(value)) {
-      obj[key] = JSON.stringify(value);
-    }
-  });
+  return _.mapValues(obj, (value) => _.isString(value) ? value : JSON.stringify(value));
 };

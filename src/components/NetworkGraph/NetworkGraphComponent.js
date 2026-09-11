@@ -4,12 +4,17 @@ import vis from 'vis-network';
 import { ACTIONS } from '../../constants';
 
 class NetworkGraph extends React.Component{
+  constructor(props) {
+    super(props);
+    this.networkRef = React.createRef();
+  }
+
   componentDidMount() {
     const data = {
       nodes: this.props.nodeHolder,
       edges: this.props.edgeHolder
     };
-    const network = new vis.Network(this.refs.myRef, data, this.props.networkOptions);
+    const network = new vis.Network(this.networkRef.current, data, this.props.networkOptions);
 
     network.on('selectNode', (params) => {
       const nodeId = params.nodes && params.nodes.length > 0 ? params.nodes[0] : null;
@@ -28,7 +33,7 @@ class NetworkGraph extends React.Component{
   }
 
   render(){
-    return (<div ref={'myRef'} className={'mynetwork'} />);
+    return (<div ref={this.networkRef} className={'mynetwork'} />);
   }
 }
 

@@ -4,11 +4,13 @@
   "author": "Umesh Jayasinghe",
   "description": "Visualize graph network corresponding to a gremlin query",
   "license": "MIT",
+  "engines": {
+    "node": ">=16"
+  },
   "dependencies": {
     "@material-ui/core": "^4.7.0",
     "@material-ui/icons": "^4.5.1",
     "axios": "^0.21.1",
-    "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "gremlin": "^3.4.4",
@@ -24,11 +26,11 @@
   },
   "proxy": "http://localhost:3001",
   "scripts": {
-    "client": "react-scripts start",
+    "client": "NODE_OPTIONS=--openssl-legacy-provider react-scripts start",
     "server": "node proxy-server.js",
     "start": "concurrently \"npm run server\" \"npm run client\"",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider react-scripts build",
+    "test": "react-scripts test --env=jsdom --passWithNoTests",
     "eject": "react-scripts eject"
   },
   "devDependencies": {

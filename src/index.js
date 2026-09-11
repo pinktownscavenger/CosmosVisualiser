@@ -11,11 +11,11 @@ import { App } from './App';
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const rootReducer = combineReducers({ gremlin: gremlinReducer, graph: graphReducer, options: optionReducer });
+const middleware = process.env.NODE_ENV === 'development' ? [createLogger()] : [];
 
 const store = createStore(
   rootReducer,
-  composeEnhancers(applyMiddleware(createLogger()))
+  composeEnhancers(applyMiddleware(...middleware))
 );
 
-//6. Render react element
 ReactDOM.render(<Provider store={store}><App /></Provider>, document.getElementById('root'));

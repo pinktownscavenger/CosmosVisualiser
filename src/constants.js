@@ -1,10 +1,7 @@
-const SERVER_URL = 'http://192.168.56.1:3001';
+const SERVER_URL = process.env.REACT_APP_API_BASE_URL || '';
 export const QUERY_ENDPOINT = `${SERVER_URL}/query`;
-// export const QUERY_ENDPOINT = '/query';
 export const COMMON_GREMLIN_ERROR = 'Invalid query. Please execute a query to get a set of vertices';
 export const ACTIONS = {
-  SET_HOST: 'SET_HOST',
-  SET_PORT: 'SET_PORT',
   SET_QUERY: 'SET_QUERY',
   SET_ERROR: 'SET_ERROR',
   SET_NETWORK: 'SET_NETWORK',
