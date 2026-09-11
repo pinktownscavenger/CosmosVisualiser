@@ -1,10 +1,11 @@
+import { describe, expect, it, vi } from 'vitest';
 import { ACTIONS } from '../constants';
 import { reducer } from './graphReducer';
 
 const makeHolder = () => ({
-  add: jest.fn(),
-  clear: jest.fn(),
-  update: jest.fn()
+  add: vi.fn(),
+  clear: vi.fn(),
+  update: vi.fn()
 });
 
 const makeState = () => ({

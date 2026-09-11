@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import request from 'supertest';
 import { rawEdges, rawVertices, normalizedGraph } from '../__fixtures__/graphFixtures';
 
@@ -7,7 +8,7 @@ const makeClient = (submit) => ({ submit });
 
 describe('server app', () => {
   it('returns health status', async () => {
-    const app = createApp({ client: makeClient(jest.fn()) });
+    const app = createApp({ client: makeClient(vi.fn()) });
 
     await request(app)
       .get('/health')
@@ -16,7 +17,7 @@ describe('server app', () => {
   });
 
   it('runs vertex and edge queries and returns normalized graph data', async () => {
-    const submit = jest.fn()
+    const submit = vi.fn()
       .mockResolvedValueOnce({ _items: rawVertices })
       .mockResolvedValueOnce({ _items: rawEdges });
     const app = createApp({ client: makeClient(submit) });
@@ -32,7 +33,7 @@ describe('server app', () => {
   });
 
   it('does not submit an edge query when no vertices are returned', async () => {
-    const submit = jest.fn().mockResolvedValueOnce({ _items: [] });
+    const submit = vi.fn().mockResolvedValueOnce({ _items: [] });
     const app = createApp({ client: makeClient(submit) });
 
     const response = await request(app)
@@ -45,7 +46,7 @@ describe('server app', () => {
   });
 
   it('rejects missing, blank, and too-large queries', async () => {
-    const submit = jest.fn();
+    const submit = vi.fn();
     const app = createApp({ client: makeClient(submit) });
     const tooLargeQuery = 'g'.repeat(MAX_QUERY_LENGTH + 1);
 
@@ -57,7 +58,7 @@ describe('server app', () => {
   });
 
   it('rejects JSON bodies over the configured parser limit', async () => {
-    const submit = jest.fn();
+    const submit = vi.fn();
     const app = createApp({ client: makeClient(submit) });
 
     await request(app)
@@ -70,9 +71,9 @@ describe('server app', () => {
 
   it('returns a server error when the Gremlin client fails', async () => {
     const error = new Error('database unavailable');
-    const submit = jest.fn().mockRejectedValue(error);
+    const submit = vi.fn().mockRejectedValue(error);
     const app = createApp({ client: makeClient(submit) });
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
 
     await request(app)
       .post('/query')

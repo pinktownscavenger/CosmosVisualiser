@@ -9,7 +9,7 @@ The app lets you run a Gremlin vertex query, render the returned graph with `vis
 - Node.js and npm
 - Azure Cosmos DB account using the Gremlin API
 
-This project still uses an older Create React App / React 16 stack. The npm scripts include the OpenSSL compatibility flag needed by newer Node versions.
+This project uses Vite for the frontend build while the UI is still on React 16.
 
 ## Configuration
 
@@ -33,10 +33,10 @@ PORT=3001
 Optional React variable:
 
 ```sh
-REACT_APP_API_BASE_URL=
+VITE_API_BASE_URL=
 ```
 
-Leave `REACT_APP_API_BASE_URL` blank during local development so Create React App uses the proxy configured in `package.json`. Set it only when the frontend is served from a different origin than the API proxy.
+Leave `VITE_API_BASE_URL` blank during local development so the Vite dev server proxies API requests to the local Node server. Set it only when the frontend is served from a different origin than the API proxy.
 
 ## Run Locally
 
@@ -51,7 +51,7 @@ Open:
 http://localhost:3000
 ```
 
-The React app runs on port `3000`; the API proxy defaults to port `3001`.
+The Vite dev server runs on its default port; the API proxy defaults to port `3001`.
 
 ## Useful Scripts
 

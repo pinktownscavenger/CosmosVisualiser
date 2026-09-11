@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { rawEdges, rawVertices, normalizedGraph } from '../__fixtures__/graphFixtures';
 
 const {

@@ -1,4 +1,4 @@
-const SERVER_URL = process.env.REACT_APP_API_BASE_URL || '';
+const SERVER_URL = import.meta.env.VITE_API_BASE_URL || '';
 export const QUERY_ENDPOINT = `${SERVER_URL}/query`;
 export const COMMON_GREMLIN_ERROR = 'Invalid query. Please execute a query to get a set of vertices';
 export const ACTIONS = {

@@ -1,10 +1,11 @@
+import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
 import { executeQuery } from './gremlinApi';
 import { QUERY_ENDPOINT } from '../constants';
 import { normalizedGraph } from '../__fixtures__/graphFixtures';
 
 describe('gremlin API client', () => {
   beforeEach(() => {
-    global.fetch = jest.fn();
+    global.fetch = vi.fn();
   });
 
   afterEach(() => {
@@ -14,7 +15,7 @@ describe('gremlin API client', () => {
   it('posts queries to the configured endpoint and returns Axios-like response data', async () => {
     global.fetch.mockResolvedValue({
       ok: true,
-      json: jest.fn().mockResolvedValue(normalizedGraph)
+      json: vi.fn().mockResolvedValue(normalizedGraph)
     });
 
     await expect(executeQuery({ query: 'g.V()', nodeLimit: 25 })).resolves.toEqual({
@@ -35,7 +36,7 @@ describe('gremlin API client', () => {
     global.fetch.mockResolvedValue({
       ok: false,
       status: 500,
-      json: jest.fn()
+      json: vi.fn()
     });
 
     await expect(executeQuery({ query: 'g.V()', nodeLimit: 25 }))
