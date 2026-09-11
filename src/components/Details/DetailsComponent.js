@@ -29,8 +29,8 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import _ from 'lodash';
 import { JsonToTable } from 'react-json-to-table';
-import { ACTIONS, COMMON_GREMLIN_ERROR, QUERY_ENDPOINT } from '../../constants';
-import axios from "axios";
+import { ACTIONS, COMMON_GREMLIN_ERROR } from '../../constants';
+import { executeQuery } from '../../api/gremlinApi';
 import { onFetchQuery} from '../../logics/actionHelper';
 import { stringifyObjectValues} from '../../logics/utils';
 
@@ -58,11 +58,7 @@ class Details extends React.Component {
 
   onTraverse(nodeId, direction) {
     const query = `g.V('${nodeId}').${direction}()`;
-    axios.post(
-      QUERY_ENDPOINT,
-      { query, nodeLimit: this.props.nodeLimit },
-      { headers: { 'Content-Type': 'application/json' } }
-    ).then((response) => {
+    executeQuery({ query, nodeLimit: this.props.nodeLimit }).then((response) => {
       onFetchQuery(response, query, this.props.nodeLabels, this.props.dispatch);
     }).catch((error) => {
       this.props.dispatch({ type: ACTIONS.SET_ERROR, payload: COMMON_GREMLIN_ERROR });

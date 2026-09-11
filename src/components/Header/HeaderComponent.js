@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Button, TextField }  from '@material-ui/core';
-import axios from 'axios';
-import { ACTIONS, QUERY_ENDPOINT, COMMON_GREMLIN_ERROR } from '../../constants';
+import { ACTIONS, COMMON_GREMLIN_ERROR } from '../../constants';
+import { executeQuery } from '../../api/gremlinApi';
 import { onFetchQuery } from '../../logics/actionHelper';
 
 class Header extends React.Component {
@@ -13,11 +13,7 @@ class Header extends React.Component {
 
   sendQuery() {
     this.props.dispatch({ type: ACTIONS.SET_ERROR, payload: null });
-    axios.post(
-      QUERY_ENDPOINT,
-      { query: this.props.query, nodeLimit: this.props.nodeLimit },
-      { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
-    ).then((response) => {
+    executeQuery({ query: this.props.query, nodeLimit: this.props.nodeLimit }).then((response) => {
       onFetchQuery(response, this.props.query, this.props.nodeLabels, this.props.dispatch);
     }).catch((error) => {
       console.error('Error sending query:', error);
