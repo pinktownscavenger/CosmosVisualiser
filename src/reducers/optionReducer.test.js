@@ -35,4 +35,17 @@ describe('option reducer', () => {
       payload: '25'
     }).nodeLimit).toBe('25');
   });
+
+  it('keeps existing defaults for optional payload actions', () => {
+    expect(reducer(undefined, {
+      type: ACTIONS.SET_IS_PHYSICS_ENABLED
+    }).isPhysicsEnabled).toBe(true);
+    expect(reducer(undefined, {
+      type: ACTIONS.SET_IS_PHYSICS_ENABLED,
+      payload: null
+    }).isPhysicsEnabled).toBe(null);
+    expect(reducer(undefined, {
+      type: ACTIONS.SET_NODE_LABELS
+    }).nodeLabels).toEqual([]);
+  });
 });

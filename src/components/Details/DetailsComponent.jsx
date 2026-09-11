@@ -27,12 +27,28 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import RefreshIcon from '@material-ui/icons/Refresh';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
-import _ from 'lodash';
 import { JsonToTable } from 'react-json-to-table';
 import { ACTIONS, COMMON_GREMLIN_ERROR } from '../../constants';
 import { executeQuery } from '../../api/gremlinApi';
 import { onFetchQuery} from '../../logics/actionHelper';
 import { stringifyObjectValues} from '../../logics/utils';
+
+const isEmpty = (value) => {
+  if (value == null) {
+    return true;
+  }
+  if (typeof value === 'string' || Array.isArray(value)) {
+    return value.length === 0;
+  }
+  return Object.keys(value).length === 0;
+};
+
+const get = (obj, key, defaultValue) => {
+  if (obj == null || obj[key] === undefined) {
+    return defaultValue;
+  }
+  return obj[key];
+};
 
 class Details extends React.Component {
 
@@ -114,17 +130,17 @@ class Details extends React.Component {
     let selectedId = null ;
     let selectedProperties = null;
     let selectedHeader = null;
-    if (!_.isEmpty(this.props.selectedNode)) {
+    if (!isEmpty(this.props.selectedNode)) {
       hasSelected = true;
-      selectedType =  _.get(this.props.selectedNode, 'type');
-      selectedId = _.get(this.props.selectedNode, 'id');
-      selectedProperties = stringifyObjectValues(_.get(this.props.selectedNode, 'properties', {}));
+      selectedType =  get(this.props.selectedNode, 'type');
+      selectedId = get(this.props.selectedNode, 'id');
+      selectedProperties = stringifyObjectValues(get(this.props.selectedNode, 'properties', {}));
       selectedHeader = 'Node';
-    } else if (!_.isEmpty(this.props.selectedEdge)) {
+    } else if (!isEmpty(this.props.selectedEdge)) {
       hasSelected = true;
-      selectedType =  _.get(this.props.selectedEdge, 'type');
-      selectedId = _.get(this.props.selectedEdge, 'id');
-      selectedProperties = stringifyObjectValues(_.get(this.props.selectedEdge, 'properties', {}));
+      selectedType =  get(this.props.selectedEdge, 'type');
+      selectedId = get(this.props.selectedEdge, 'id');
+      selectedProperties = stringifyObjectValues(get(this.props.selectedEdge, 'properties', {}));
       selectedHeader = 'Edge';
     }
 

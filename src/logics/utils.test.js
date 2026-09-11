@@ -64,11 +64,32 @@ describe('frontend graph utilities', () => {
     expect(result.nodeLabels[0]).toEqual({ type: 'person', field: 'aliases' });
   });
 
+  it('treats missing edge collections as empty', () => {
+    const result = extractEdgesAndNodes([
+      { id: 'person-1', label: 'person', properties: { name: 'Ada Lovelace' } }
+    ], []);
+
+    expect(result.edges).toEqual([]);
+    expect(result.nodes).toHaveLength(1);
+  });
+
   it('diffs nodes by id', () => {
     expect(getDiffNodes(
       [{ id: 'a' }, { id: 'b' }],
       [{ id: 'a' }]
     )).toEqual([{ id: 'b' }]);
+  });
+
+  it('diffs edges by fallback endpoint signature when ids are missing', () => {
+    expect(getDiffEdges(
+      [
+        { from: 'person-1', to: 'project-1', type: 'created' },
+        { from: 'person-1', to: 'company-1', type: 'works_at' }
+      ],
+      [{ from: 'person-1', to: 'project-1', type: 'created' }]
+    )).toEqual([
+      { from: 'person-1', to: 'company-1', type: 'works_at' }
+    ]);
   });
 
   it('diffs edges by id without collapsing parallel edges', () => {
@@ -96,5 +117,15 @@ describe('frontend graph utilities', () => {
       active: 'true'
     });
     expect(properties.scores).toEqual([1, 2]);
+  });
+
+  it('preserves string object values while stringifying other objects', () => {
+    expect(stringifyObjectValues({
+      name: new String('Ada'),
+      details: { role: 'mathematician' }
+    })).toEqual({
+      name: new String('Ada'),
+      details: '{"role":"mathematician"}'
+    });
   });
 });

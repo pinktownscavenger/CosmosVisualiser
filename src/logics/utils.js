@@ -1,17 +1,32 @@
-import _ from 'lodash';
-
 const selectRandomField = (obj) => {
   let firstKey;
   for (firstKey in obj) break;
   return firstKey;
 };
 
+const keyBy = (list, key) => list.reduce((result, item) => {
+  result[item[key]] = item;
+  return result;
+}, {});
+
+const mapValues = (obj, mapper) => Object.keys(obj).reduce((result, key) => {
+  result[key] = mapper(obj[key], key);
+  return result;
+}, {});
+
+const isString = (value) => typeof value === 'string' || value instanceof String;
+
+const differenceBy = (newList, oldList, getKey) => {
+  const oldKeys = new Set(oldList.map(getKey));
+  return newList.filter((item) => !oldKeys.has(getKey(item)));
+};
+
 export const getDiffNodes = (newList, oldList) => {
-  return _.differenceBy(newList, oldList, (node) => node.id);
+  return differenceBy(newList, oldList, (node) => node.id);
 };
 
 export const getDiffEdges = (newList, oldList) => {
-  return _.differenceBy(newList, oldList, (edge) => edge.id || `${edge.from},${edge.type},${edge.to}`);
+  return differenceBy(newList, oldList, (edge) => edge.id || `${edge.from},${edge.type},${edge.to}`);
 };
 
 export const extractEdgesAndNodes = (nodeList, nodeLabels=[]) => {
@@ -19,9 +34,9 @@ export const extractEdgesAndNodes = (nodeList, nodeLabels=[]) => {
   const nodes = [];
 
   const nextNodeLabels = [...nodeLabels];
-  const nodeLabelMap =_.mapValues( _.keyBy(nodeLabels, 'type'), 'field');
+  const nodeLabelMap = mapValues(keyBy(nodeLabels, 'type'), (nodeLabel) => nodeLabel.field);
 
-  _.forEach(nodeList, (node) => {
+  nodeList.forEach((node) => {
     const type = node.label;
     if (!nodeLabelMap[type]) {
       const field = selectRandomField(node.properties);
@@ -33,16 +48,16 @@ export const extractEdgesAndNodes = (nodeList, nodeLabels=[]) => {
     const label = labelField in node.properties ? node.properties[labelField] : type;
     nodes.push({ id: node.id, label: String(label), group: node.label, properties: node.properties, type });
 
-    edges = edges.concat(_.map(node.edges, edge => ({ ...edge, type: edge.label, arrows: { to: { enabled: true, scaleFactor: 0.5 } } })));
+    edges = edges.concat((node.edges || []).map(edge => ({ ...edge, type: edge.label, arrows: { to: { enabled: true, scaleFactor: 0.5 } } })));
   });
 
   return { edges, nodes, nodeLabels: nextNodeLabels }
 };
 
 export const findNodeById = (nodeList, id) => {
-  return _.find(nodeList, node => node.id === id);
+  return nodeList.find(node => node.id === id);
 };
 
 export const stringifyObjectValues = (obj) => {
-  return _.mapValues(obj, (value) => _.isString(value) ? value : JSON.stringify(value));
+  return mapValues(obj, (value) => isString(value) ? value : JSON.stringify(value));
 };

@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { ACTIONS } from '../constants';
 
 const initialState = {
@@ -47,7 +46,7 @@ const initialState = {
 export const reducer =  (state=initialState, action)=>{
   switch (action.type){
     case ACTIONS.SET_IS_PHYSICS_ENABLED: {
-      const isPhysicsEnabled = _.get(action, 'payload', true);
+      const isPhysicsEnabled = action.payload === undefined ? true : action.payload;
       return { ...state, isPhysicsEnabled };
     }
     case ACTIONS.ADD_QUERY_HISTORY: {
@@ -57,7 +56,7 @@ export const reducer =  (state=initialState, action)=>{
       return { ...state, queryHistory: [] }
     }
     case ACTIONS.SET_NODE_LABELS: {
-      const nodeLabels = _.get(action, 'payload', []);
+      const nodeLabels = action.payload === undefined ? [] : action.payload;
       return { ...state, nodeLabels };
     }
     case ACTIONS.ADD_NODE_LABEL: {

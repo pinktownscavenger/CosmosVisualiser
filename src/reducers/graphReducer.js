@@ -1,7 +1,16 @@
 import vis from 'vis-network';
-import _ from 'lodash';
 import { ACTIONS } from '../constants';
 import { getDiffNodes, getDiffEdges, findNodeById } from '../logics/utils';
+
+const keyBy = (list, key) => list.reduce((result, item) => {
+  result[item[key]] = item;
+  return result;
+}, {});
+
+const mapValues = (obj, mapper) => Object.keys(obj).reduce((result, key) => {
+  result[key] = mapper(obj[key], key);
+  return result;
+}, {});
 
 const initialState = {
   network: null,
@@ -53,8 +62,8 @@ export const reducer =  (state=initialState, action)=>{
       return { ...state, selectedEdge, selectedNode: {} };
     }
     case ACTIONS.REFRESH_NODE_LABELS: {
-      const nodeLabelMap =_.mapValues( _.keyBy(action.payload, 'type'), 'field');
-      const nodes = _.map(state.nodes, node => {
+      const nodeLabelMap = mapValues(keyBy(action.payload, 'type'), (nodeLabel) => nodeLabel.field);
+      const nodes = state.nodes.map(node => {
         if (node.type in nodeLabelMap) {
           const field = nodeLabelMap[node.type];
           const label = node.properties[field];
