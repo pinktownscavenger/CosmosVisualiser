@@ -1,0 +1,115 @@
+function mapPropertiesToObj(properties) {
+  const obj = {};
+  Object.entries(properties || {}).forEach(([key, value]) => {
+    obj[key] = Array.isArray(value) ? value.map(item => item.value !== undefined ? item.value : item) : value;
+  });
+  return obj;
+}
+
+function stringifyGremlinId(id) {
+  return typeof id === 'string' ? id : JSON.stringify(id);
+}
+
+function normalizeEdge(edge) {
+  return {
+    id: stringifyGremlinId(edge.id),
+    from: edge.from,
+    to: edge.to,
+    label: edge.label,
+    properties: mapPropertiesToObj(edge.properties)
+  };
+}
+
+function buildEdgeMap(edges) {
+  const edgeMap = {};
+
+  edges.forEach((edge) => {
+    const formattedEdge = normalizeEdge(edge);
+    [formattedEdge.from, formattedEdge.to].forEach((vertexId) => {
+      if (!edgeMap[vertexId]) {
+        edgeMap[vertexId] = [];
+      }
+      edgeMap[vertexId].push(formattedEdge);
+    });
+  });
+
+  return edgeMap;
+}
+
+function uniqueEdges(edges) {
+  const seen = new Set();
+
+  return edges.filter((edge) => {
+    const edgeKey = edge.id || `${edge.from}:${edge.label}:${edge.to}`;
+    if (seen.has(edgeKey)) {
+      return false;
+    }
+
+    seen.add(edgeKey);
+    return true;
+  });
+}
+
+function verticesToJson(vertices, edges) {
+  const edgeMap = buildEdgeMap(edges);
+
+  return vertices.map(vertex => {
+    const connectedEdges = uniqueEdges(edgeMap[vertex.id] || []);
+
+    return {
+      id: vertex.id,
+      label: vertex.label,
+      type: vertex.type,
+      properties: mapPropertiesToObj(vertex.properties),
+      edges: connectedEdges
+    };
+  });
+}
+
+function makeLimitClause(nodeLimit) {
+  const parsedLimit = Number(nodeLimit);
+  return Number.isInteger(parsedLimit) && parsedLimit > 0 ? `.limit(${parsedLimit})` : '';
+}
+
+function escapeGremlinString(value) {
+  return String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
+function makeEdgeQuery(vertexIds) {
+  if (vertexIds.length === 0) {
+    return null;
+  }
+
+  const ids = vertexIds
+    .map(id => typeof id === 'string' ? id : JSON.stringify(id))
+    .map(id => `'${escapeGremlinString(id)}'`)
+    .join(',');
+  return `
+    g.V(${ids})
+      .bothE()
+      .dedup()
+      .project('id', 'label', 'from', 'to', 'properties')
+      .by(id())
+      .by(label())
+      .by(outV().id())
+      .by(inV().id())
+      .by(valueMap())
+  `;
+}
+
+function makeVertexQuery(query, nodeLimit) {
+  return `${query}${makeLimitClause(nodeLimit)}`;
+}
+
+module.exports = {
+  buildEdgeMap,
+  escapeGremlinString,
+  makeEdgeQuery,
+  makeLimitClause,
+  makeVertexQuery,
+  mapPropertiesToObj,
+  normalizeEdge,
+  stringifyGremlinId,
+  uniqueEdges,
+  verticesToJson
+};

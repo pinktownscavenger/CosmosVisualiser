@@ -1,0 +1,85 @@
+import { rawEdges, rawVertices, normalizedGraph } from '../__fixtures__/graphFixtures';
+
+const {
+  escapeGremlinString,
+  makeEdgeQuery,
+  makeLimitClause,
+  makeVertexQuery,
+  mapPropertiesToObj,
+  normalizeEdge,
+  uniqueEdges,
+  verticesToJson
+} = require('./graphHelpers');
+
+describe('graph helper normalization', () => {
+  it('maps Cosmos valueMap properties to plain object arrays', () => {
+    expect(mapPropertiesToObj(rawVertices[0].properties)).toEqual({
+      name: ['Ada Lovelace'],
+      aliases: ['Ada', 'Enchantress of Numbers'],
+      active: [true]
+    });
+  });
+
+  it('normalizes edge ids and properties', () => {
+    expect(normalizeEdge({
+      id: { relation: 'composite' },
+      label: 'knows',
+      from: 'person-1',
+      to: 'person-2',
+      properties: { weight: [{ value: 2 }] }
+    })).toEqual({
+      id: '{"relation":"composite"}',
+      label: 'knows',
+      from: 'person-1',
+      to: 'person-2',
+      properties: { weight: [2] }
+    });
+  });
+
+  it('attaches adjacent edges to normalized vertices', () => {
+    expect(verticesToJson(rawVertices, rawEdges)).toEqual(normalizedGraph);
+  });
+
+  it('returns an empty graph for empty vertex results', () => {
+    expect(verticesToJson([], rawEdges)).toEqual([]);
+  });
+
+  it('deduplicates repeated edges while preserving parallel edges', () => {
+    const repeatedEdges = [rawEdges[1], rawEdges[1], rawEdges[2]];
+
+    expect(uniqueEdges(repeatedEdges)).toEqual([rawEdges[1], rawEdges[2]]);
+  });
+});
+
+describe('graph helper query builders', () => {
+  it('escapes Gremlin string ids', () => {
+    expect(escapeGremlinString("tag-'quoted\\id")).toBe("tag-\\'quoted\\\\id");
+  });
+
+  it('builds edge queries for selected vertex ids', () => {
+    const query = makeEdgeQuery(['person-1', "tag-'quoted\\id", { partition: 'a' }]);
+
+    expect(query).toContain("g.V('person-1','tag-\\'quoted\\\\id','{\"partition\":\"a\"}')");
+    expect(query).toContain('.bothE()');
+    expect(query).toContain('.dedup()');
+    expect(query).toContain(".project('id', 'label', 'from', 'to', 'properties')");
+  });
+
+  it('skips edge queries when no vertices were returned', () => {
+    expect(makeEdgeQuery([])).toBeNull();
+  });
+
+  it('applies limits only for positive integers', () => {
+    expect(makeLimitClause(10)).toBe('.limit(10)');
+    expect(makeLimitClause('25')).toBe('.limit(25)');
+    expect(makeLimitClause(0)).toBe('');
+    expect(makeLimitClause(-1)).toBe('');
+    expect(makeLimitClause('10.5')).toBe('');
+    expect(makeLimitClause('not-a-number')).toBe('');
+  });
+
+  it('appends a valid node limit to vertex queries', () => {
+    expect(makeVertexQuery('g.V()', 2)).toBe('g.V().limit(2)');
+    expect(makeVertexQuery('g.V()', '')).toBe('g.V()');
+  });
+});
