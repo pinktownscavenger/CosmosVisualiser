@@ -6,10 +6,6 @@ Cosmos-native Gremlin graph visualization that is credential-free to try with fi
 
 This project is a modernized fork of [prabushitha/gremlin-visualizer](https://github.com/prabushitha/gremlin-visualizer), originally created by Umesh Prabushitha Jayasinghe and released under the MIT License.
 
-![Cosmos Gremlin Visualizer screenshot](docs/media/cosmos-gremlin-visualizer.png)
-
-[Watch the fixture-mode demo GIF](docs/media/cosmos-gremlin-visualizer-demo.gif)
-
 Cosmos Gremlin Visualizer is a local React visualizer for Azure Cosmos DB Gremlin API graphs. It lets you run a Gremlin vertex query, render the returned graph with `vis-network`, inspect node and edge properties, customize node labels, view query history, cap returned vertices, and traverse inbound or outbound connections from a selected node.
 
 ## Try It In Under A Minute
@@ -95,8 +91,6 @@ The project has two local runtime processes:
 - A Node/Express proxy on port `3001`.
 
 The browser posts `{ query, nodeLimit }` to `/query`. The proxy keeps Cosmos DB credentials server-side, submits the vertex query through the Gremlin driver, fetches adjacent edges for the returned vertices, normalizes the graph payload, and returns it to the UI. In fixture mode, the proxy swaps the real Gremlin client for a static in-memory client.
-
-For deeper implementation details, see [docs/TECHNICAL_OVERVIEW.md](docs/TECHNICAL_OVERVIEW.md).
 
 ## Query Behavior
 
