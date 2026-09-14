@@ -16,6 +16,16 @@ describe('server app', () => {
       .expect({ status: 'ok' });
   });
 
+  it('allows the Vite dev origin by default', async () => {
+    const app = createApp({ client: makeClient(vi.fn()) });
+
+    await request(app)
+      .get('/health')
+      .set('Origin', 'http://localhost:5173')
+      .expect('Access-Control-Allow-Origin', 'http://localhost:5173')
+      .expect(200);
+  });
+
   it('runs vertex and edge queries and returns normalized graph data', async () => {
     const submit = vi.fn()
       .mockResolvedValueOnce({ _items: rawVertices })

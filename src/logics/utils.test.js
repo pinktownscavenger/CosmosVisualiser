@@ -104,6 +104,20 @@ describe('frontend graph utilities', () => {
     ]);
   });
 
+  it('deduplicates incoming edges before diffing against existing edges', () => {
+    expect(getDiffEdges(
+      [
+        { id: 'edge-2', from: 'person-1', to: 'project-1', type: 'created' },
+        { id: 'edge-2', from: 'person-1', to: 'project-1', type: 'created' },
+        { id: 'edge-3', from: 'person-1', to: 'project-1', type: 'reviewed' }
+      ],
+      []
+    )).toEqual([
+      { id: 'edge-2', from: 'person-1', to: 'project-1', type: 'created' },
+      { id: 'edge-3', from: 'person-1', to: 'project-1', type: 'reviewed' }
+    ]);
+  });
+
   it('stringifies non-string property values without mutating the input', () => {
     const properties = {
       name: 'Ada',

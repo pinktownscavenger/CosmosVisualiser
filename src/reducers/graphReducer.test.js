@@ -70,6 +70,28 @@ describe('graph reducer', () => {
     ]);
   });
 
+  it('deduplicates repeated new edge ids before updating the DataSet holder', () => {
+    const state = makeState();
+    const nextState = reducer(state, {
+      type: ACTIONS.ADD_EDGES,
+      payload: [
+        { id: 'edge-2', from: 'person-1', to: 'project-1', type: 'created' },
+        { id: 'edge-2', from: 'person-1', to: 'project-1', type: 'created' },
+        { id: 'edge-3', from: 'person-1', to: 'project-1', type: 'reviewed' }
+      ]
+    });
+
+    expect(nextState.edges).toEqual([
+      state.edges[0],
+      { id: 'edge-2', from: 'person-1', to: 'project-1', type: 'created' },
+      { id: 'edge-3', from: 'person-1', to: 'project-1', type: 'reviewed' }
+    ]);
+    expect(state.edgeHolder.add).toHaveBeenCalledWith([
+      { id: 'edge-2', from: 'person-1', to: 'project-1', type: 'created' },
+      { id: 'edge-3', from: 'person-1', to: 'project-1', type: 'reviewed' }
+    ]);
+  });
+
   it('sets selected node and clears selected edge', () => {
     const state = { ...makeState(), selectedEdge: { id: 'edge-1' } };
 

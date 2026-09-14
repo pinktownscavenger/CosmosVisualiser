@@ -13,8 +13,8 @@
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "gremlin": "^3.8.2",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
     "react-json-to-table": "^0.1.5",
     "react-redux": "^7.1.3",
     "redux": "^4.0.4",
@@ -22,9 +22,11 @@
     "vis-network": "^6.4.4"
   },
   "scripts": {
-    "client": "vite",
+    "client": "vite --host 0.0.0.0",
     "server": "node proxy-server.js",
+    "server:fixture": "USE_FIXTURE_DATA=true node proxy-server.js",
     "start": "concurrently \"npm run server\" \"npm run client\"",
+    "start:fixture": "USE_FIXTURE_DATA=true concurrently \"npm run server\" \"npm run client\"",
     "build": "vite build",
     "test": "vitest run --passWithNoTests"
   },

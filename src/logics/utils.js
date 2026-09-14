@@ -21,12 +21,25 @@ const differenceBy = (newList, oldList, getKey) => {
   return newList.filter((item) => !oldKeys.has(getKey(item)));
 };
 
+const uniqueBy = (list, getKey) => {
+  const seenKeys = new Set();
+  return list.filter((item) => {
+    const key = getKey(item);
+    if (seenKeys.has(key)) {
+      return false;
+    }
+    seenKeys.add(key);
+    return true;
+  });
+};
+
 export const getDiffNodes = (newList, oldList) => {
   return differenceBy(newList, oldList, (node) => node.id);
 };
 
 export const getDiffEdges = (newList, oldList) => {
-  return differenceBy(newList, oldList, (edge) => edge.id || `${edge.from},${edge.type},${edge.to}`);
+  const getEdgeKey = (edge) => edge.id || `${edge.from},${edge.type},${edge.to}`;
+  return differenceBy(uniqueBy(newList, getEdgeKey), oldList, getEdgeKey);
 };
 
 export const extractEdgesAndNodes = (nodeList, nodeLabels=[]) => {

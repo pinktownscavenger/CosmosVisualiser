@@ -1,12 +1,12 @@
-FROM node:16-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 COPY . .
 
-EXPOSE 3000 3001
+EXPOSE 5173 3001
 
 CMD npm start

@@ -12,7 +12,7 @@ function isValidQuery(query) {
   return typeof query === 'string' && query.trim().length > 0 && query.length <= MAX_QUERY_LENGTH;
 }
 
-function createApp({ client, allowedOrigin = 'http://localhost:3000' }) {
+function createApp({ client, allowedOrigin = 'http://localhost:5173' }) {
   const app = express();
 
   app.use(cors({
