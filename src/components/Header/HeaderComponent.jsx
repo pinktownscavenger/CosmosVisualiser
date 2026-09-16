@@ -25,17 +25,59 @@ class Header extends React.Component {
     this.props.dispatch({ type: ACTIONS.SET_QUERY, payload: query });
   }
 
+  onSubmit(event) {
+    event.preventDefault();
+    this.sendQuery();
+  }
+
   render(){
     return (
       <div className={'header'}>
-        <form noValidate autoComplete="off">
-          <TextField value={this.props.query} onChange={(event => this.onQueryChanged(event.target.value))} id="standard-basic" label="gremlin query" style={{width: '70%'}} />
-          <Button variant="contained" color="primary" onClick={this.sendQuery.bind(this)} style={{width: '150px'}} >Execute</Button>
-          <Button variant="outlined" color="secondary" onClick={this.clearGraph.bind(this)} style={{width: '150px'}} >Clear Graph</Button>
+        <div className="header__topline">
+          <div>
+            <p className="header__eyebrow">Graph query workspace</p>
+            <h1 className="header__title">Gremlin Visualizer</h1>
+          </div>
+          <div className="header__meta" aria-label="Graph summary">
+            <span className="metric-pill">
+              <span className="metric-pill__value">{this.props.nodes.length}</span>
+              <span className="metric-pill__label">Nodes</span>
+            </span>
+            <span className="metric-pill">
+              <span className="metric-pill__value">{this.props.edges.length}</span>
+              <span className="metric-pill__label">Edges</span>
+            </span>
+          </div>
+        </div>
+
+        <form noValidate autoComplete="off" className="query-form" onSubmit={this.onSubmit.bind(this)}>
+          <TextField
+            value={this.props.query}
+            onChange={(event => this.onQueryChanged(event.target.value))}
+            id="gremlin-query"
+            label="Gremlin query"
+            className="query-field"
+            InputLabelProps={{ shrink: true }}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            type="submit"
+            className="query-button query-button--execute"
+          >
+            Execute
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={this.clearGraph.bind(this)}
+            className="query-button query-button--clear"
+          >
+            Clear Graph
+          </Button>
         </form>
 
-        <br />
-        <div style={{color: 'red'}}>{this.props.error}</div>
+        {this.props.error && <div className="error-banner" role="alert">{this.props.error}</div>}
       </div>
 
     );

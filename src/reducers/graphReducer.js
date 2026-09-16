@@ -1,6 +1,7 @@
 import vis from 'vis-network';
 import { ACTIONS } from '../constants';
 import { getDiffNodes, getDiffEdges, findNodeById } from '../logics/utils';
+import { demoEdges, demoNodes } from '../demoGraph';
 
 const keyBy = (list, key) => list.reduce((result, item) => {
   result[item[key]] = item;
@@ -14,10 +15,10 @@ const mapValues = (obj, mapper) => Object.keys(obj).reduce((result, key) => {
 
 const initialState = {
   network: null,
-  nodeHolder: new vis.DataSet([]),
-  edgeHolder: new vis.DataSet([]),
-  nodes: [],
-  edges: [],
+  nodeHolder: new vis.DataSet(demoNodes),
+  edgeHolder: new vis.DataSet(demoEdges),
+  nodes: demoNodes,
+  edges: demoEdges,
   selectedNode: {},
   selectedEdge: {},
 };

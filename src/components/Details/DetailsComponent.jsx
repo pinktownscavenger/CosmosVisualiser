@@ -94,6 +94,10 @@ class Details extends React.Component {
   }
 
   generateList(list) {
+    if (list.length === 0) {
+      return <p className="details__empty">No queries have been executed yet.</p>;
+    }
+
     return list.map((value, index) => (
         <ListItem key={`${value}-${index}`}>
           <ListItemText
@@ -106,20 +110,22 @@ class Details extends React.Component {
   generateNodeLabelList(nodeLabels) {
     return nodeLabels.map((nodeLabel, index) => (
         <ListItem key={index}>
-          <TextField id="standard-basic" label="Node Type" InputLabelProps={{ shrink: true }} value={nodeLabel.type} onChange={event => {
-            const type = event.target.value;
-            const field = nodeLabel.field;
-            this.onEditNodeLabel(index, { type, field })
-          }}
-          />
-          <TextField id="standard-basic" label="Label Field" InputLabelProps={{ shrink: true }} value={nodeLabel.field} onChange={event => {
-            const field = event.target.value;
-            const type = nodeLabel.type;
-            this.onEditNodeLabel(index, { type, field })
-          }}/>
-          <IconButton aria-label="delete" size="small" onClick={() => this.onRemoveNodeLabel(index)}>
-            <DeleteIcon fontSize="small" />
-          </IconButton>
+          <div className="details__label-row">
+            <TextField id={`node-type-${index}`} label="Node Type" InputLabelProps={{ shrink: true }} value={nodeLabel.type} onChange={event => {
+              const type = event.target.value;
+              const field = nodeLabel.field;
+              this.onEditNodeLabel(index, { type, field })
+            }}
+            />
+            <TextField id={`label-field-${index}`} label="Label Field" InputLabelProps={{ shrink: true }} value={nodeLabel.field} onChange={event => {
+              const field = event.target.value;
+              const type = nodeLabel.type;
+              this.onEditNodeLabel(index, { type, field })
+            }}/>
+            <IconButton aria-label={`Remove node label ${index + 1}`} size="small" onClick={() => this.onRemoveNodeLabel(index)}>
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </div>
         </ListItem>
     ));
   }
@@ -149,32 +155,32 @@ class Details extends React.Component {
       <div className={'details'}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={12} md={12}>
-            <ExpansionPanel>
+            <ExpansionPanel className="details__section">
               <ExpansionPanelSummary
                 expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1a-content"
-                id="panel1a-header"
+                aria-controls="query-history-content"
+                id="query-history-header"
               >
-                <Typography>Query History</Typography>
+                <Typography className="details__heading">Query History</Typography>
               </ExpansionPanelSummary>
               <ExpansionPanelDetails>
-                <List dense={true}>
+                <List dense={true} className="details__list">
                   {this.generateList(this.props.queryHistory)}
                 </List>
               </ExpansionPanelDetails>
             </ExpansionPanel>
-            <ExpansionPanel>
+            <ExpansionPanel className="details__section" defaultExpanded>
               <ExpansionPanelSummary
                 expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1a-content"
-                id="panel1a-header"
+                aria-controls="settings-content"
+                id="settings-header"
               >
-                <Typography>Settings</Typography>
+                <Typography className="details__heading">Settings</Typography>
               </ExpansionPanelSummary>
               <ExpansionPanelDetails>
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={12} md={12}>
-                    <Tooltip title="Automatically stabilize the graph" aria-label="add">
+                    <Tooltip title="Automatically stabilize the graph" aria-label="Physics setting">
                     <FormControlLabel
                       control={
                         <Switch
@@ -190,8 +196,8 @@ class Details extends React.Component {
                     <Divider />
                   </Grid>
                   <Grid item xs={12} sm={12} md={12}>
-                    <Tooltip title="Number of maximum nodes which should return from the query. Empty or 0 has no restrictions." aria-label="add">
-                      <TextField label="Node Limit" type="Number" variant="outlined" value={this.props.nodeLimit} onChange={event => {
+                    <Tooltip title="Number of maximum nodes returned from the query. Empty or 0 has no restriction." aria-label="Node limit setting">
+                      <TextField label="Node Limit" type="Number" value={this.props.nodeLimit} onChange={event => {
                         const limit = event.target.value;
                         this.onEditNodeLimit(limit)
                       }} />
@@ -202,14 +208,15 @@ class Details extends React.Component {
                     <Divider />
                   </Grid>
                   <Grid item xs={12} sm={12} md={12}>
-                    <Typography>Node Labels</Typography>
+                    <Typography className="details__heading">Node Labels</Typography>
+                    <p className="details__subheading">Choose which property is shown for each node type.</p>
                   </Grid>
                   <Grid item xs={12} sm={12} md={12}>
-                    <List dense={true}>
+                    <List dense={true} className="details__list">
                       {this.generateNodeLabelList(this.props.nodeLabels)}
                     </List>
                   </Grid>
-                  <Grid item xs={12} sm={12} md={12}>
+                  <Grid item xs={12} sm={12} md={12} className="details__actions">
                     <Fab variant="extended" color="primary" size="small" onClick={this.onRefresh.bind(this)}>
                       <RefreshIcon />
                       Refresh
@@ -225,9 +232,13 @@ class Details extends React.Component {
           </Grid>
           {hasSelected &&
           <Grid item xs={12} sm={12} md={12}>
-            <h2>Information: {selectedHeader}</h2>
+            <section className="selected-panel">
+            <div className="selected-panel__header">
+              <h2 className="selected-panel__title">Selected {selectedHeader}</h2>
+              <span className="selected-panel__badge">{String(selectedType)}</span>
+            </div>
             {selectedHeader === 'Node' &&
-            <Grid item xs={12} sm={12} md={12}>
+            <Grid item xs={12} sm={12} md={12} className="selected-panel__actions">
               <Grid container spacing={2}>
                 <Grid item xs={6} sm={6} md={6}>
                   <Fab variant="extended" size="small" onClick={() => this.onTraverse(selectedId, 'out')}>
@@ -245,7 +256,7 @@ class Details extends React.Component {
             </Grid>
             }
             <Grid item xs={12} sm={12} md={12}>
-              <Grid container>
+              <Grid container className="selected-panel__table">
                 <Table aria-label="simple table">
                   <TableBody>
                     <TableRow key={'type'}>
@@ -261,6 +272,7 @@ class Details extends React.Component {
                 <JsonToTable json={selectedProperties}/>
               </Grid>
             </Grid>
+            </section>
           </Grid>
           }
         </Grid>

@@ -27,14 +27,54 @@ const initialState = {
       shape: "dot",
       size: 20,
       borderWidth: 2,
+      color: {
+        background: '#22c55e',
+        border: '#bbf7d0',
+        highlight: {
+          background: '#86efac',
+          border: '#f8fafc'
+        }
+      },
       font: {
-        size: 11
+        color: '#f8fafc',
+        face: 'JetBrains Mono',
+        size: 12,
+        strokeColor: '#0f172a',
+        strokeWidth: 4
+      }
+    },
+    groups: {
+      person: {
+        color: { background: '#22c55e', border: '#bbf7d0' }
+      },
+      company: {
+        color: { background: '#38bdf8', border: '#bae6fd' }
+      },
+      project: {
+        color: { background: '#a78bfa', border: '#ddd6fe' }
+      },
+      dataset: {
+        color: { background: '#f59e0b', border: '#fde68a' }
+      },
+      tag: {
+        color: { background: '#f43f5e', border: '#fecdd3' },
+        shape: 'box'
       }
     },
     edges: {
-      width: 2,
+      color: {
+        color: '#64748b',
+        highlight: '#22c55e',
+        hover: '#94a3b8'
+      },
+      selectionWidth: 3,
+      width: 1.5,
       font: {
-        size: 11
+        color: '#cbd5e1',
+        face: 'JetBrains Mono',
+        size: 11,
+        strokeColor: '#0f172a',
+        strokeWidth: 3
       },
       smooth: {
         type: 'dynamic'

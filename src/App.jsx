@@ -8,20 +8,19 @@ import { DetailsComponent } from './components/Details/DetailsComponent';
 export class App extends React.Component{
   render(){
     return (
-      <div>
-        <Grid container spacing={1}>
+      <main className="app-shell">
+        <Grid container spacing={2} className="app-layout">
           <Grid item xs={12} sm={12} md={12}>
             <HeaderComponent />
           </Grid>
-          <Grid item xs={12} sm={9} md={9}>
+          <Grid item xs={12} sm={8} md={9} className="graph-frame">
             <NetworkGraphComponent />
           </Grid>
-          <Grid item xs={12} sm={3} md={3}>
+          <Grid item xs={12} sm={4} md={3} className="workspace-panel">
             <DetailsComponent />
           </Grid>
         </Grid>
-
-      </div>
+      </main>
       );
   }
 }
