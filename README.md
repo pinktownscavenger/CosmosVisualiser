@@ -6,11 +6,35 @@ Cosmos-native Gremlin graph visualization that is credential-free to try with fi
 
 This project is a modernized fork of [prabushitha/gremlin-visualizer](https://github.com/prabushitha/gremlin-visualizer), originally created by Umesh Prabushitha Jayasinghe and released under the MIT License.
 
-Cosmos Gremlin Visualizer is a local React visualizer for Azure Cosmos DB Gremlin API graphs. It lets you run a Gremlin vertex query, render the returned graph with `vis-network`, inspect node and edge properties, customize node labels, view query history, cap returned vertices, and traverse inbound or outbound connections from a selected node.
+![Cosmos Gremlin Visualizer dashboard](.github/assets/cosmos-gremlin-visualizer-overview.png)
+
+Cosmos Gremlin Visualizer is a local React workspace for exploring Azure Cosmos DB Gremlin API graphs. It starts with a credential-free demo graph, lets you run Gremlin vertex queries through a local proxy, renders the returned graph with `vis-network`, and gives you a focused side panel for labels, limits, physics, history, and selected graph details.
+
+## Demo
+
+The fixture-mode demo shows the credential-free query path pulling a graph with `g.V().limit(25)`.
+
+![Fixture-mode demo recording](.github/assets/cosmos-gremlin-visualizer-demo.webp)
+
+A source H.264 MP4 is also available:
+
+[Watch the demo recording](.github/assets/cosmos-gremlin-visualizer-demo.mp4)
+
+GitHub does not reliably render committed `.mp4` files inline in README files. For a native inline GitHub video player, upload `.github/assets/cosmos-gremlin-visualizer-demo.mp4` through a GitHub issue, pull request, or README web-editor attachment flow, then paste the generated `https://github.com/user-attachments/assets/...` URL here on its own line.
+
+## Screenshots
+
+### Fixture Query Result
+
+![Fixture graph query result](.github/assets/cosmos-gremlin-visualizer-query-result.png)
+
+### Graph Selection
+
+![Selected graph relationship](.github/assets/cosmos-gremlin-visualizer-selected.png)
 
 ## Try It In Under A Minute
 
-Fixture mode runs without Azure credentials. It uses a built-in sample graph so you can clone the repo and try the UI immediately.
+Fixture mode runs without Azure credentials. It uses a built-in sample graph and fixture query responses so you can clone the repo and try the UI immediately.
 
 ```sh
 npm install --legacy-peer-deps
@@ -73,15 +97,14 @@ The Vite dev server runs on port `5173`; the API proxy defaults to port `3001`.
 
 ## Features
 
-- Execute Gremlin vertex queries against Azure Cosmos DB Gremlin API.
-- Try the app without credentials using built-in fixture data.
-- Render query results as an interactive `vis-network` graph.
-- Inspect node and edge IDs, labels, types, and properties.
-- Merge successive query results into the current graph until cleared.
-- Traverse inbound or outbound neighbors from a selected node.
-- Customize node display labels by vertex type and property field.
-- Keep local query history for the current session.
-- Cap returned vertices with a configurable node limit.
+- Credential-free startup with a seeded demo graph.
+- Fixture mode for pulling a sample graph with `g.V().limit(25)`.
+- Cosmos-native query proxy that keeps database credentials server-side.
+- Dark graph workspace with node and edge counters.
+- Interactive `vis-network` graph rendering with directed edge labels.
+- Query history, graph clearing, physics toggling, and node-limit controls.
+- Configurable node display labels by vertex type and property field.
+- Selected-node and selected-edge inspection with traversal actions.
 
 ## How It Works
 
@@ -90,7 +113,7 @@ The project has two local runtime processes:
 - A Vite React frontend on port `5173`.
 - A Node/Express proxy on port `3001`.
 
-The browser posts `{ query, nodeLimit }` to `/query`. The proxy keeps Cosmos DB credentials server-side, submits the vertex query through the Gremlin driver, fetches adjacent edges for the returned vertices, normalizes the graph payload, and returns it to the UI. In fixture mode, the proxy swaps the real Gremlin client for a static in-memory client.
+The browser posts `{ query, nodeLimit }` to `/query`. The proxy keeps Cosmos DB credentials server-side, submits the vertex query through the Gremlin driver, fetches adjacent edges for the returned vertices, normalizes the graph payload, and returns it to the UI. In fixture mode, the proxy swaps the real Gremlin client for a static in-memory client while the frontend also starts with a presentational demo graph.
 
 ## Query Behavior
 
