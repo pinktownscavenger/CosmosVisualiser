@@ -1,9 +1,9 @@
 {
-  "short_name": "Gremlin-Visualizer",
-  "name": "Gremlin Visualizer",
+  "short_name": "Gremlin-Visualiser",
+  "name": "Gremlin Visualiser",
   "icons": [
     {
-      "src": "gremlin-visualizer.png",
+      "src": "gremlin-visualiser.png",
       "sizes": "64x64",
       "type": "image/png"
     }

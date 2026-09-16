@@ -1,8 +1,8 @@
 {
-  "name": "gremlin-visualizer",
+  "name": "gremlin-visualiser",
   "version": "1.0.0",
   "author": "Umesh Jayasinghe",
-  "description": "Visualize graph network corresponding to a gremlin query",
+  "description": "Visualise graph network corresponding to a gremlin query",
   "license": "MIT",
   "engines": {
     "node": ">=20"

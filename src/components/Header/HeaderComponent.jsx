@@ -36,7 +36,7 @@ class Header extends React.Component {
         <div className="header__topline">
           <div>
             <p className="header__eyebrow">Graph query workspace</p>
-            <h1 className="header__title">Gremlin Visualizer</h1>
+            <h1 className="header__title">Gremlin Visualiser</h1>
           </div>
           <div className="header__meta" aria-label="Graph summary">
             <span className="metric-pill">
