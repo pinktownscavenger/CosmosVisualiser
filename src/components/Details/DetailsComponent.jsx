@@ -11,6 +11,8 @@ import {
   TextField,
   Fab,
   IconButton,
+  Button,
+  ButtonGroup,
   Grid,
   Table,
   TableBody,
@@ -32,23 +34,7 @@ import { ACTIONS, COMMON_GREMLIN_ERROR } from '../../constants';
 import { executeQuery } from '../../api/gremlinApi';
 import { onFetchQuery} from '../../logics/actionHelper';
 import { stringifyObjectValues} from '../../logics/utils';
-
-const isEmpty = (value) => {
-  if (value == null) {
-    return true;
-  }
-  if (typeof value === 'string' || Array.isArray(value)) {
-    return value.length === 0;
-  }
-  return Object.keys(value).length === 0;
-};
-
-const get = (obj, key, defaultValue) => {
-  if (obj == null || obj[key] === undefined) {
-    return defaultValue;
-  }
-  return obj[key];
-};
+import { getSelectedResultPayload } from '../../logics/selectedResult';
 
 class Details extends React.Component {
 
@@ -93,6 +79,10 @@ class Details extends React.Component {
     }
   }
 
+  onSelectedResultViewModeChanged(selectedResultViewMode) {
+    this.props.dispatch({ type: ACTIONS.SET_SELECTED_RESULT_VIEW_MODE, payload: selectedResultViewMode });
+  }
+
   generateList(list) {
     if (list.length === 0) {
       return <p className="details__empty">No queries have been executed yet.</p>;
@@ -131,25 +121,10 @@ class Details extends React.Component {
   }
 
   render(){
-    let hasSelected = false;
-    let selectedType = null;
-    let selectedId = null ;
-    let selectedProperties = null;
-    let selectedHeader = null;
-    if (!isEmpty(this.props.selectedNode)) {
-      hasSelected = true;
-      selectedType =  get(this.props.selectedNode, 'type');
-      selectedId = get(this.props.selectedNode, 'id');
-      selectedProperties = stringifyObjectValues(get(this.props.selectedNode, 'properties', {}));
-      selectedHeader = 'Node';
-    } else if (!isEmpty(this.props.selectedEdge)) {
-      hasSelected = true;
-      selectedType =  get(this.props.selectedEdge, 'type');
-      selectedId = get(this.props.selectedEdge, 'id');
-      selectedProperties = stringifyObjectValues(get(this.props.selectedEdge, 'properties', {}));
-      selectedHeader = 'Edge';
-    }
-
+    const selectedResult = getSelectedResultPayload(this.props.selectedNode, this.props.selectedEdge);
+    const hasSelected = selectedResult !== null;
+    const selectedHeader = hasSelected ? selectedResult.kind[0].toUpperCase() + selectedResult.kind.slice(1) : null;
+    const selectedProperties = hasSelected ? stringifyObjectValues(selectedResult.properties) : {};
 
     return (
       <div className={'details'}>
@@ -230,24 +205,46 @@ class Details extends React.Component {
               </ExpansionPanelDetails>
             </ExpansionPanel>
           </Grid>
-          {hasSelected &&
           <Grid item xs={12} sm={12} md={12}>
             <section className="selected-panel">
-            <div className="selected-panel__header">
-              <h2 className="selected-panel__title">Selected {selectedHeader}</h2>
-              <span className="selected-panel__badge">{String(selectedType)}</span>
-            </div>
-            {selectedHeader === 'Node' &&
+              <div className="selected-panel__header">
+                <div>
+                  <h2 className="selected-panel__title">{hasSelected ? `Selected ${selectedHeader}` : 'Selected Result'}</h2>
+                  {!hasSelected && <p className="selected-panel__hint">Choose a node or edge to inspect its details.</p>}
+                  {hasSelected &&
+                  <span className="selected-panel__badge">{String(selectedResult.type)}</span>
+                  }
+                </div>
+                <ButtonGroup className="selected-panel__view-toggle" size="small" aria-label="Selected result view mode">
+                  <Button
+                    variant={this.props.selectedResultViewMode === 'table' ? 'contained' : 'outlined'}
+                    color="primary"
+                    onClick={() => this.onSelectedResultViewModeChanged('table')}
+                    aria-pressed={this.props.selectedResultViewMode === 'table'}
+                  >
+                    Table
+                  </Button>
+                  <Button
+                    variant={this.props.selectedResultViewMode === 'json' ? 'contained' : 'outlined'}
+                    color="primary"
+                    onClick={() => this.onSelectedResultViewModeChanged('json')}
+                    aria-pressed={this.props.selectedResultViewMode === 'json'}
+                  >
+                    JSON
+                  </Button>
+                </ButtonGroup>
+              </div>
+            {hasSelected && selectedResult.kind === 'node' &&
             <Grid item xs={12} sm={12} md={12} className="selected-panel__actions">
               <Grid container spacing={2}>
                 <Grid item xs={6} sm={6} md={6}>
-                  <Fab variant="extended" size="small" onClick={() => this.onTraverse(selectedId, 'out')}>
+                  <Fab variant="extended" size="small" onClick={() => this.onTraverse(selectedResult.id, 'out')}>
                     Traverse Out Edges
                     <ArrowForwardIcon/>
                   </Fab>
                 </Grid>
                 <Grid item xs={6} sm={6} md={6}>
-                  <Fab variant="extended" size="small" onClick={() => this.onTraverse(selectedId, 'in')}>
+                  <Fab variant="extended" size="small" onClick={() => this.onTraverse(selectedResult.id, 'in')}>
                     Traverse In Edges
                     <ArrowBackIcon/>
                   </Fab>
@@ -255,26 +252,35 @@ class Details extends React.Component {
               </Grid>
             </Grid>
             }
+            {!hasSelected &&
+            <p className="selected-panel__empty">No graph result is selected yet.</p>
+            }
+            {hasSelected &&
             <Grid item xs={12} sm={12} md={12}>
+              {this.props.selectedResultViewMode === 'table' &&
               <Grid container className="selected-panel__table">
                 <Table aria-label="simple table">
                   <TableBody>
                     <TableRow key={'type'}>
                       <TableCell scope="row">Type</TableCell>
-                      <TableCell align="left">{String(selectedType)}</TableCell>
+                      <TableCell align="left">{String(selectedResult.type)}</TableCell>
                     </TableRow>
                     <TableRow key={'id'}>
                       <TableCell scope="row">ID</TableCell>
-                      <TableCell align="left">{String(selectedId)}</TableCell>
+                      <TableCell align="left">{String(selectedResult.id)}</TableCell>
                     </TableRow>
                   </TableBody>
                 </Table>
                 <JsonToTable json={selectedProperties}/>
               </Grid>
+              }
+              {this.props.selectedResultViewMode === 'json' &&
+              <pre className="selected-panel__json">{JSON.stringify(selectedResult, null, 2)}</pre>
+              }
             </Grid>
+            }
             </section>
           </Grid>
-          }
         </Grid>
       </div>
     );
@@ -289,6 +295,7 @@ export const DetailsComponent = connect((state)=>{
     queryHistory: state.options.queryHistory,
     nodeLabels: state.options.nodeLabels,
     nodeLimit: state.options.nodeLimit,
-    isPhysicsEnabled: state.options.isPhysicsEnabled
+    isPhysicsEnabled: state.options.isPhysicsEnabled,
+    selectedResultViewMode: state.options.selectedResultViewMode
   };
 })(Details);

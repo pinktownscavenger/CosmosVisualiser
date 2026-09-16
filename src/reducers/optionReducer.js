@@ -5,6 +5,7 @@ const initialState = {
   queryHistory: [],
   isPhysicsEnabled: true,
   nodeLimit: 100,
+  selectedResultViewMode: 'table',
   networkOptions: {
     physics: {
       forceAtlas2Based: {
@@ -145,6 +146,12 @@ export const reducer =  (state=initialState, action)=>{
     case ACTIONS.SET_NODE_LIMIT: {
       const nodeLimit = action.payload;
       return { ...state, nodeLimit };
+    }
+    case ACTIONS.SET_SELECTED_RESULT_VIEW_MODE: {
+      if (action.payload !== 'table' && action.payload !== 'json') {
+        return state;
+      }
+      return { ...state, selectedResultViewMode: action.payload };
     }
     default:
       return state;

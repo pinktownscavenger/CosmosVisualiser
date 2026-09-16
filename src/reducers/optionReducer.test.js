@@ -36,6 +36,35 @@ describe('option reducer', () => {
     }).nodeLimit).toBe('25');
   });
 
+  it('defaults the selected result view mode to table', () => {
+    expect(reducer(undefined, { type: 'UNKNOWN' }).selectedResultViewMode).toBe('table');
+  });
+
+  it('stores selected result view mode values', () => {
+    const jsonState = reducer(undefined, {
+      type: ACTIONS.SET_SELECTED_RESULT_VIEW_MODE,
+      payload: 'json'
+    });
+
+    expect(jsonState.selectedResultViewMode).toBe('json');
+    expect(reducer(jsonState, {
+      type: ACTIONS.SET_SELECTED_RESULT_VIEW_MODE,
+      payload: 'table'
+    }).selectedResultViewMode).toBe('table');
+  });
+
+  it('ignores invalid selected result view mode values', () => {
+    const jsonState = reducer(undefined, {
+      type: ACTIONS.SET_SELECTED_RESULT_VIEW_MODE,
+      payload: 'json'
+    });
+
+    expect(reducer(jsonState, {
+      type: ACTIONS.SET_SELECTED_RESULT_VIEW_MODE,
+      payload: 'card'
+    })).toBe(jsonState);
+  });
+
   it('keeps existing defaults for optional payload actions', () => {
     expect(reducer(undefined, {
       type: ACTIONS.SET_IS_PHYSICS_ENABLED
