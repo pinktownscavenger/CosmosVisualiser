@@ -61,10 +61,10 @@ const initialState = {
         color: { background: '#f43f5e', border: '#fecdd3' },
         shape: 'box',
         margin: {
-          top: 6,
-          right: 10,
-          bottom: 6,
-          left: 10
+          top: 5,
+          right: 8,
+          bottom: 5,
+          left: 8
         },
         font: {
           color: '#fff1f2',
@@ -72,14 +72,6 @@ const initialState = {
           size: 10,
           strokeColor: '#0f172a',
           strokeWidth: 2
-        },
-        heightConstraint: {
-          minimum: 30,
-          valign: 'middle'
-        },
-        widthConstraint: {
-          minimum: 88,
-          maximum: 88
         }
       }
     },
