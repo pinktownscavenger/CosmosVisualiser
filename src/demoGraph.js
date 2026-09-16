@@ -44,7 +44,7 @@ export const demoNodes = [
   },
   {
     id: 'tag-production',
-    label: 'production',
+    label: 'Production',
     group: 'tag',
     type: 'tag',
     properties: {

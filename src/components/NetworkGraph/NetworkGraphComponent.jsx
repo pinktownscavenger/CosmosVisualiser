@@ -16,6 +16,15 @@ class NetworkGraph extends React.Component{
     };
     const network = new vis.Network(this.networkRef.current, data, this.props.networkOptions);
 
+    network.once('stabilizationIterationsDone', () => {
+      network.fit({
+        animation: {
+          duration: 300,
+          easingFunction: 'easeInOutQuad'
+        }
+      });
+    });
+
     network.on('selectNode', (params) => {
       const nodeId = params.nodes && params.nodes.length > 0 ? params.nodes[0] : null;
       this.props.dispatch({ type: ACTIONS.SET_SELECTED_NODE, payload: nodeId });

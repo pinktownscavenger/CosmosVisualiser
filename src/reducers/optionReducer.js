@@ -58,7 +58,28 @@ const initialState = {
       },
       tag: {
         color: { background: '#f43f5e', border: '#fecdd3' },
-        shape: 'box'
+        shape: 'box',
+        margin: {
+          top: 6,
+          right: 10,
+          bottom: 6,
+          left: 10
+        },
+        font: {
+          color: '#fff1f2',
+          face: 'JetBrains Mono',
+          size: 10,
+          strokeColor: '#0f172a',
+          strokeWidth: 2
+        },
+        heightConstraint: {
+          minimum: 30,
+          valign: 'middle'
+        },
+        widthConstraint: {
+          minimum: 88,
+          maximum: 88
+        }
       }
     },
     edges: {
