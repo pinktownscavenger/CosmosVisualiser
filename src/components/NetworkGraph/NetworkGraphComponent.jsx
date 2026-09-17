@@ -15,14 +15,10 @@ class NetworkGraph extends React.Component{
       edges: this.props.edgeHolder
     };
     const network = new vis.Network(this.networkRef.current, data, this.props.networkOptions);
+    this.network = network;
 
-    network.once('stabilizationIterationsDone', () => {
-      network.fit({
-        animation: {
-          duration: 300,
-          easingFunction: 'easeInOutQuad'
-        }
-      });
+    network.on('stabilized', () => {
+      network.stopSimulation();
     });
 
     network.on('selectNode', (params) => {
@@ -41,6 +37,12 @@ class NetworkGraph extends React.Component{
     this.props.dispatch({ type: ACTIONS.SET_NETWORK, payload: network });
   }
 
+  componentWillUnmount() {
+    if (this.network) {
+      this.network.destroy();
+    }
+  }
+
   render(){
     return (<div ref={this.networkRef} className={'mynetwork'} />);
   }
@@ -50,6 +52,7 @@ export const NetworkGraphComponent = connect((state)=>{
   return {
     nodeHolder: state.graph.nodeHolder,
     edgeHolder: state.graph.edgeHolder,
+    network: state.graph.network,
     networkOptions: state.options.networkOptions
   };
 })(NetworkGraph);

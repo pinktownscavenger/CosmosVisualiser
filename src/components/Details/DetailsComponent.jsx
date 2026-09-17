@@ -70,12 +70,16 @@ class Details extends React.Component {
   onTogglePhysics(enabled){
     this.props.dispatch({ type: ACTIONS.SET_IS_PHYSICS_ENABLED, payload: enabled });
     if (this.props.network) {
+      const physics = enabled ? this.props.networkOptions.physics : false;
       const edges = {
         smooth: {
-          type: enabled ? 'dynamic' : 'continuous'
+          type: 'continuous'
         }
       };
-      this.props.network.setOptions( { physics: enabled, edges } );
+      this.props.network.setOptions( { physics, edges } );
+      if (!enabled) {
+        this.props.network.stopSimulation();
+      }
     }
   }
 
@@ -296,6 +300,7 @@ export const DetailsComponent = connect((state)=>{
     nodeLabels: state.options.nodeLabels,
     nodeLimit: state.options.nodeLimit,
     isPhysicsEnabled: state.options.isPhysicsEnabled,
-    selectedResultViewMode: state.options.selectedResultViewMode
+    selectedResultViewMode: state.options.selectedResultViewMode,
+    networkOptions: state.options.networkOptions
   };
 })(Details);

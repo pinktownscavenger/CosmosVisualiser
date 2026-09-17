@@ -21,7 +21,8 @@ const initialState = {
       stabilization: {
         enabled: true,
         iterations: 50,
-        updateInterval: 25
+        updateInterval: 25,
+        fit: false
       }
     },
     nodes: {
@@ -91,7 +92,7 @@ const initialState = {
         strokeWidth: 3
       },
       smooth: {
-        type: 'dynamic'
+        type: 'continuous'
       }
     }
   }
